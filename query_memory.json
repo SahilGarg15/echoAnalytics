@@ -1,0 +1,12 @@
+{
+    "last_operation": null,
+    "last_column": null,
+    "history": [
+        {
+            "ts": "2025-08-16T12:33:35",
+            "query": "sort by literacy_rate",
+            "result": "'Query not understood or data not found.'",
+            "used_context": false
+        }
+    ]
+}

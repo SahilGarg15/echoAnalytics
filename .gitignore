@@ -1,0 +1,35 @@
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.env
+.env*/
+venv/
+.venv/
+
+# Jupyter/IPython
+.ipynb_checkpoints/
+
+# Logs and temp
+*.log
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Archives
+*.zip
+
+# Local data artifacts (uncomment if you don't want to track logs/memory)
+# query_log.csv
+# query_memory.json
+
+# VS Code
+.vscode/
+
+# pytest cache
+.pytest_cache/
