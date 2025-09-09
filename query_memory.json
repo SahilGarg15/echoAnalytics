@@ -1,11 +1,23 @@
 {
-    "last_operation": null,
+    "last_operation": "show_tail",
     "last_column": null,
     "history": [
         {
             "ts": "2025-08-16T12:33:35",
             "query": "sort by literacy_rate",
             "result": "'Query not understood or data not found.'",
+            "used_context": false
+        },
+        {
+            "ts": "2025-08-28T20:00:15",
+            "query": "show first five rows",
+            "result": "            state  population  literacy_rate  sex_ratio\n0  Andhra Pradesh    49577103           67.4        993\n1           Bihar   104099452           61.8        918\n2          Kerala    33406061           94.0       1084\n3          Punjab    27743338           75.8        895\n4       Rajasthan    68548437           66.1        928",
+            "used_context": false
+        },
+        {
+            "ts": "2025-08-28T20:00:21",
+            "query": "last five",
+            "result": "           state  population  literacy_rate  sex_ratio\n5    Maharashtra   112374333           82.3        929\n6     Tamil Nadu    72147030           80.1        996\n7  Uttar Pradesh   199812341           69.7        912\n8    West Bengal    91276115           76.3        950\n9        Gujarat    60439692           78.0        919",
             "used_context": false
         }
     ]
