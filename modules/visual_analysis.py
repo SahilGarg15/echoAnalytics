@@ -742,10 +742,10 @@
 #             elif len(scatter_cols) > 6:
 #                 st.warning("Too many columns selected. Please select 6 or fewer.")
 
-"""
-Upgraded visual analysis helpers + EDA report generator.
-Save as: echoAnalytics/modules/visual_analysis.py
-"""
+# """
+# Upgraded visual analysis helpers + EDA report generator.
+# Save as: echoAnalytics/modules/visual_analysis.py
+# """
 
 import streamlit as st
 import pandas as pd
@@ -754,6 +754,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
 from io import BytesIO
+
+import pypandoc
+pypandoc.download_pandoc()
+
 
 sns.set(style="whitegrid")
 
@@ -948,3 +952,83 @@ def analyze_dataset(df: pd.DataFrame) -> None:
                     st.info("Select 6 or fewer columns for interactive scatter matrix to avoid heavy rendering.")
 
     st.caption("Tip: when dataset is large, plots are sampled for responsiveness.")
+
+# Add at the top
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
+from reportlab.lib.styles import getSampleStyleSheet
+import pypandoc
+
+
+# -----------------------------
+# EDA report generation (PDF & Markdown)
+# -----------------------------
+def generate_eda_report_pdf(df: pd.DataFrame, filename: str = "eda_report.pdf") -> bytes:
+    """Generate a simple EDA report as PDF and return as bytes."""
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    # Title
+    elements.append(Paragraph("Auto EDA Report", styles["Title"]))
+    elements.append(Spacer(1, 12))
+
+    # Basic info
+    elements.append(Paragraph(f"Rows: {df.shape[0]}  |  Columns: {df.shape[1]}", styles["Normal"]))
+    elements.append(Spacer(1, 12))
+
+    # Summary statistics
+    if not df.select_dtypes(include="number").empty:
+        desc = df.describe().reset_index()
+        data = [desc.columns.tolist()] + desc.values.tolist()
+        table = Table(data)
+        elements.append(Paragraph("Summary Statistics (numeric):", styles["Heading2"]))
+        elements.append(table)
+        elements.append(Spacer(1, 12))
+
+    # Categorical counts
+    cats = df.select_dtypes(include="object").columns.tolist()
+    if cats:
+        elements.append(Paragraph("Categorical Top Values:", styles["Heading2"]))
+        for c in cats[:5]:
+            vc = df[c].value_counts().nlargest(10)
+            data = [[c, "Count"]] + [[idx, val] for idx, val in vc.items()]
+            table = Table(data)
+            elements.append(Paragraph(f"Column: {c}", styles["Heading3"]))
+            elements.append(table)
+            elements.append(Spacer(1, 12))
+
+    doc.build(elements)
+    pdf_bytes = buffer.getvalue()
+    buffer.close()
+    return pdf_bytes
+
+
+def generate_eda_report_md(df: pd.DataFrame) -> bytes:
+    """Generate EDA report as Markdown and return bytes."""
+    md_parts = []
+    md_parts.append("# Auto EDA Report\n")
+
+    # Basic info
+    md_parts.append(f"**Rows:** {df.shape[0]}  |  **Columns:** {df.shape[1]}\n")
+
+    # Summary stats
+    if not df.select_dtypes(include="number").empty:
+        md_parts.append("## Summary Statistics (numeric)\n")
+        md_parts.append(df.describe().to_markdown())
+
+    # Categorical counts
+    cats = df.select_dtypes(include="object").columns.tolist()
+    if cats:
+        md_parts.append("\n## Categorical Top Values\n")
+        for c in cats[:5]:
+            vc = df[c].value_counts().nlargest(10)
+            md_parts.append(f"### {c}\n")
+            md_parts.append(vc.to_frame().to_markdown())
+
+    md_text = "\n\n".join(md_parts)
+    # Convert to standalone markdown (pandoc ensures proper encoding)
+    output = pypandoc.convert_text(md_text, "md", format="md", extra_args=["--standalone"])
+    return output.encode("utf-8")

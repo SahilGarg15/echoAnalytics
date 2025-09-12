@@ -1877,10 +1877,30 @@ with tabs[4]:
         _download_bytes(pq_bytes, f"{filename}.parquet", "application/octet-stream", key=f"dl_parquet_{filename}")
 
     st.divider()
+    # st.subheader("One-click EDA Report")
+    # if st.button("Generate & download EDA report (HTML)", key="c_generate_eda"):
+    #     report_bytes = va.generate_eda_report(st.session_state.df, sample_n=2000)
+    #     _download_bytes(report_bytes, "eda_report.html", "text/html", key="dl_eda_report")
+    
     st.subheader("One-click EDA Report")
-    if st.button("Generate & download EDA report (HTML)", key="c_generate_eda"):
-        report_bytes = va.generate_eda_report(st.session_state.df, sample_n=2000)
-        _download_bytes(report_bytes, "eda_report.html", "text/html", key="dl_eda_report")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        if st.button("Generate HTML", key="c_generate_html"):
+            report_bytes = va.generate_eda_report(st.session_state.df, sample_n=2000)
+            _download_bytes(report_bytes, "eda_report.html", "text/html", key="dl_eda_report")
+
+    with col2:
+        if st.button("Generate PDF", key="c_generate_pdf"):
+            pdf_bytes = va.generate_eda_report_pdf(st.session_state.df)
+            _download_bytes(pdf_bytes, "eda_report.pdf", "application/pdf", key="dl_pdf_eda_report")
+
+    with col3:
+        if st.button("Generate Markdown", key="c_generate_md"):
+            md_bytes = va.generate_eda_report_md(st.session_state.df)
+            _download_bytes(md_bytes, "eda_report.md", "text/markdown", key="dl_md_eda_report")
+
 
 # Tab 5: undo / reset
 with tabs[5]:
